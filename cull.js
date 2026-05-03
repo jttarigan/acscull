@@ -318,6 +318,14 @@ const { writeSidecar } = require(path.join(PROJECT_DIR, 'src', 'bake', 'sidecarW
     const bakeMesh = new THREE.SkinnedMesh(bakingGeom, bakeMat);
     bakeMesh.bind(merged.skeleton, merged.bindMatrix);
     attachBakeUniformHooks(bakeMesh, bakeMat);
+    // Disable frustum culling: SkinnedMesh's default bbox check uses
+    // attribute-space positions, not bone-deformed positions, so when the
+    // input GLB has nested transforms (e.g., autoFitAndCenter scale + ±90°
+    // FBX axis flip from in-app exportBundle output), the renderer thinks
+    // the bake mesh is far from the camera frustum and skips most groups.
+    // The cull NEEDS every group to render — visibility = whatever camera
+    // saw, not whatever the engine decided to draw.
+    bakeMesh.frustumCulled = false;
 
     const bakeScene = new THREE.Scene();
     bakeScene.add(bakeMesh);
