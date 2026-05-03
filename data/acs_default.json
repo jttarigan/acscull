@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "pitch_min_deg": 55.0,
+  "pitch_max_deg": 70.0,
+  "yaw_min_deg": 0.0,
+  "yaw_max_deg": 360.0,
+  "distance_min": 8.0,
+  "distance_max": 12.0,
+  "horizontal_fov_deg": 60.0,
+  "aspect_ratio": 1.7777778,
+  "target_offset": [0.0, 1.0, 0.0],
+  "k_cameras": 64,
+  "p_poses": 20,
+  "supersample": 2,
+  "render_resolution": [512, 512],
+  "pose_animations": ["idle", "walk", "run", "attack_punch"],
+  "pose_sample_stride": 4
+}

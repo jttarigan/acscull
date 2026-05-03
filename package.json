@@ -1,0 +1,34 @@
+{
+  "name": "acscull",
+  "version": "0.1.0",
+  "description": "ACSCull: visibility-aware triangle elimination for skinned characters in top-down games. Reference implementation accompanying the MethodsX submission.",
+  "main": "cull.js",
+  "scripts": {
+    "test": "node tests/bakingGeometry.test.js && node tests/ssim.test.js",
+    "test:bakingGeometry": "node tests/bakingGeometry.test.js",
+    "test:ssim": "node tests/ssim.test.js",
+    "cull": "electron cull.js",
+    "validate": "electron validate.js"
+  },
+  "keywords": [
+    "glb",
+    "gltf",
+    "mesh-optimization",
+    "skinned-mesh",
+    "occlusion-culling",
+    "electron",
+    "threejs",
+    "webgl2"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "electron": "^41.2.1",
+    "fflate": "^0.8.2",
+    "three": "^0.184.0"
+  }
+}

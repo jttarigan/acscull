@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies (no-postinstall)
+        # Skip Electron's postinstall — the pure-Node tests don't need the
+        # binary, and pulling it on every CI run is wasteful + occasionally
+        # rate-limited on github.com:443.
+        run: npm install --ignore-scripts
+      - name: Run pure-Node tests
+        run: npm test

@@ -1,0 +1,21 @@
+node_modules/
+package-lock.json.bak
+
+# Cull / validate outputs left next to bundle inputs
+examples/**/character_reduced.glb
+examples/**/character_merged.glb
+examples/**/character_reduced.glb.acsbake.json
+examples/**/character_reduced.glb.kept.bin
+examples/**/validation/
+examples/**/_*.html
+examples/**/_*tmp*
+
+# Sample bundles fetched at runtime via examples/fetch_samples.sh
+examples/*/character.glb
+examples/*/character.fbx
+examples/*/animations/
+
+# Electron junk
+out/
+.DS_Store
+Thumbs.db

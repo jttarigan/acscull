@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software in academic work, please cite both the software and the accompanying methods paper."
+title: "ACSCull: visibility-aware triangle elimination for skinned characters in top-down games"
+abstract: >
+  ACSCull is an offline pre-pass that removes triangles never visible from any
+  camera in a game's Admissible Camera Set (ACS), using a K-camera × P-pose
+  rasterization sweep with per-triangle ID readback. The reference implementation
+  runs as a headless Electron + Three.js + WebGL2 pipeline and emits a reduced
+  glTF Binary (GLB) suitable for shipping to mobile NDK / OpenGL ES runtimes.
+authors:
+  - family-names: Tarigan
+    given-names: Jos
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/jttarigan/acscull"
+keywords:
+  - mesh-optimization
+  - skinned-mesh
+  - occlusion-culling
+  - glb
+  - gltf
+  - top-down-games
+  - mobile-graphics
+version: 0.1.0
+date-released: "2026-05-03"
