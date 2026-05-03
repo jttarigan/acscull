@@ -267,7 +267,30 @@ const { writeSidecar } = require(path.join(PROJECT_DIR, 'src', 'bake', 'sidecarW
       const clips = obj.animations || [];
       for (const c of clips) externalAnims.push(c);
     }
-    const allClips = [...intrinsicAnims, ...externalAnims];
+    // Strip "bad" tracks that some FBX exports embed:
+    //   - *.scale tracks: FBX cm→m unit metadata leaks as 100× scale tracks
+    //     on every bone (e.g. astronaut Character_Animations.fbx). Three.js
+    //     applies them every mixer.update → bone matrices blow up ~100×, the
+    //     skinned mesh renders far off-camera, and the visibility pass only
+    //     catches the few triangles that happen to fall within the camera's
+    //     range. Without this filter, astronaut/animal-builder bundles get
+    //     ~98%+ "reduction" because most triangles are never seen.
+    //   - Root.position tracks: root-motion drift that pulls the character
+    //     out of the ACS target window across the clip. Removing it keeps
+    //     the character near target_offset for the whole sample.
+    // Mirrors viewer renderer.js's stripBadTracks. Aminset_Basic / Piloto
+    // clips don't have these artifacts; the filter is a no-op there.
+    function stripBadTracks(clips) {
+      return clips.map(clip => {
+        const filtered = clip.tracks.filter(t => {
+          if (/\\.scale$/.test(t.name)) return false;
+          if (/^Root\\.position$/.test(t.name)) return false;
+          return true;
+        });
+        return new THREE.AnimationClip(clip.name, clip.duration, filtered);
+      });
+    }
+    const allClips = stripBadTracks([...intrinsicAnims, ...externalAnims]);
     // clipFilter is optional. null/empty → use all clips found. Otherwise
     // substring-match (case-insensitive) so legacy filters like
     // ["idle","run"] still work alongside exact-name picks.
