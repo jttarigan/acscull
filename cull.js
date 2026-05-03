@@ -126,16 +126,20 @@ const bundleManifest = loadBundleManifest(flags.bundle);
 const characterFile = findCharacterFile(flags.bundle);
 const animationFiles = findAnimationFiles(flags.bundle);
 const acsSource = resolveAcs(flags, bundleManifest);
-const clipFilter = (Array.isArray(bundleManifest.clipFilter) && bundleManifest.clipFilter.length > 0)
-  ? bundleManifest.clipFilter
-  : DEFAULT_CLIP_FILTER;
+// clipFilter is optional and additive: when present, only clips whose names
+// substring-match an entry pass through; when absent or empty, every clip
+// found in animations/ + intrinsic clips of character.glb is included. The
+// "include all" default lets a user drop a Mixamo FBX into animations/ and
+// re-cull without touching bundle.json.
+const hasClipFilter = Array.isArray(bundleManifest.clipFilter) && bundleManifest.clipFilter.length > 0;
+const clipFilter = hasClipFilter ? bundleManifest.clipFilter : null;
 
 console.log('Bundle:      ' + flags.bundle);
 console.log('Character:   ' + path.relative(flags.bundle, characterFile));
 console.log('Animations:  ' + (animationFiles.length === 0
   ? '(none — clips read from character only)'
   : animationFiles.map(f => path.relative(flags.bundle, f)).join(', ')));
-console.log('Clip filter: ' + clipFilter.join(', '));
+console.log('Clip filter: ' + (clipFilter ? clipFilter.join(', ') : '(none — using all clips)'));
 console.log('Out:         ' + flags.out);
 
 app.whenReady().then(() => {
@@ -264,16 +268,25 @@ const { writeSidecar } = require(path.join(PROJECT_DIR, 'src', 'bake', 'sidecarW
       for (const c of clips) externalAnims.push(c);
     }
     const allClips = [...intrinsicAnims, ...externalAnims];
-    const exportAnims = allClips.filter(c => {
-      const n = c.name.toLowerCase();
-      return CLIP_FILTER.some(f => n.includes(f.toLowerCase()));
-    });
+    // clipFilter is optional. null/empty → use all clips found. Otherwise
+    // substring-match (case-insensitive) so legacy filters like
+    // ["idle","run"] still work alongside exact-name picks.
+    const exportAnims = (CLIP_FILTER && CLIP_FILTER.length > 0)
+      ? allClips.filter(c => {
+          const n = c.name.toLowerCase();
+          return CLIP_FILTER.some(f => n.includes(f.toLowerCase()));
+        })
+      : allClips;
     if (exportAnims.length === 0) {
-      throw new Error('No clips matched filter [' + CLIP_FILTER.join(', ')
-        + ']. Available: ' + allClips.map(c => c.name).join(', '));
+      const filterDesc = (CLIP_FILTER && CLIP_FILTER.length > 0)
+        ? 'filter [' + CLIP_FILTER.join(', ') + ']'
+        : '(no filter)';
+      throw new Error('No clips matched ' + filterDesc
+        + '. Available: ' + allClips.map(c => c.name).join(', '));
     }
     baseObj.animations = exportAnims;
-    console.log('Clips: ' + allClips.length + ' total → ' + exportAnims.length + ' kept by filter');
+    console.log('Clips: ' + allClips.length + ' total → ' + exportAnims.length
+      + (CLIP_FILTER ? ' kept by filter' : ' (no filter, using all)'));
 
     scene.add(baseObj);
 

@@ -94,7 +94,7 @@ Renders both meshes from 128 held-out cameras (Halton bases distinct from the cu
 All fields except `name` are optional. Defaults:
 
 - `acs` → [`data/acs_default.json`](data/acs_default.json) (a 55°–70° pitch, 60° FOV, 16:9 ACS suitable for typical mobile top-down).
-- `clipFilter` → `["idle", "run", "walk", "attack_punch"]` (case-insensitive substring match against clip names).
+- `clipFilter` → **omit or empty array means "use all clips"**. When a non-empty array is provided, each entry is matched against every clip's `name` as a case-insensitive substring. Clips that don't match any entry are excluded from sampling and from the reduced GLB. Lets you drop a Mixamo FBX into `animations/` and re-cull without editing the manifest.
 
 The bundle can also carry an `authoringPreset` field — opaque to ACSCull, used by upstream authoring tools to round-trip edits.
 
@@ -103,7 +103,7 @@ The bundle can also carry an `authoringPreset` field — opaque to ACSCull, used
 The cull is **format-permissive on input** and **strict on output**:
 
 - Input: `character.glb` *or* `character.fbx` (auto-detected). Use whichever your DCC tool exports cleanly.
-- Animations: any number of `.fbx` files in `<bundle>/animations/`. Clips with names containing any string in `clipFilter` (case-insensitive) are kept.
+- Animations: any number of `.fbx` files in `<bundle>/animations/`. Without a `clipFilter`, all clips found are included; with a `clipFilter`, clips with names containing any filter entry (case-insensitive substring) are kept.
 - Output: always GLB. Designed to be consumed by mobile/embedded runtimes via cgltf or equivalent.
 
 ## Why GLB?
