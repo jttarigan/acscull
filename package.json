@@ -27,7 +27,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "electron": "^41.2.1",
+    "electron": "^41.5.0",
     "fflate": "^0.8.2",
     "three": "^0.184.0"
   }
